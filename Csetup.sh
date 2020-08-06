@@ -4,11 +4,11 @@
 
 dpkg -l | grep -qw gdebi || sudo apt-get install -yyq gdebi
 
-# Initial Software
+# Check for Update
 
 sudo apt update
 
-# Purge Firefox, install Brave:
+# Purge Firefox (if you wan), install Brave:
 
 #sudo apt purge firefox -yy
 #sudo apt purge firefox-locale-en -yy
@@ -42,7 +42,7 @@ sudo apt install steam-installer
 ## Disable Apport
 sudo sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
-# Gotta reboot now:
+# Update it ALL:
 sudo apt update && sudo apt upgrade -y
 
 # Install Git on Linux:
@@ -53,3 +53,4 @@ git --version
 
 # Message:
 zenity --info --text="All Done!"
+notify-send 'ALl Done!'
