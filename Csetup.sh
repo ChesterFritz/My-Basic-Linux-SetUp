@@ -53,4 +53,4 @@ git --version
 
 # Message:
 zenity --info --text="All Done!"
-notify-send 'ALl Done!'
+notify-send 'ALl Done!' 'remember to configure your Git'
