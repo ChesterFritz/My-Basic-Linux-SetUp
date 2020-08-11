@@ -50,6 +50,12 @@ sudo apt-get update
 sudo apt-get install git
 git --version
 
+# Install Java                                                    
+sudo apt install default-jre
+sudo apt install default-jdk
+javac -version
+java -version
+echo Java is Installed
 
 # Message:
 zenity --info --text="All Done!"
