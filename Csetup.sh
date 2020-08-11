@@ -1,6 +1,6 @@
 #!/bin/dash
 
-# Ubuntu My (GNOME) setup script.
+# Ubuntu and PopOs My (GNOME) setup script.
 
 dpkg -l | grep -qw gdebi || sudo apt-get install -yyq gdebi
 
@@ -39,6 +39,10 @@ sudo apt-get install -y gimp scribus
 sudo apt-get install -y steam-installer
 sudo apt install steam-installer
 
+sudo add-apt-repository ppa:lutris-team/lutris
+sudo apt-get update
+sudo apt-get install lutris
+
 ## Disable Apport
 sudo sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
 
@@ -50,12 +54,12 @@ sudo apt-get update
 sudo apt-get install git
 git --version
 
-# Install Java                                                    
+# Install Java 
 sudo apt install default-jre
 sudo apt install default-jdk
 javac -version
 java -version
-echo Java is Installed
+echo Java is Installed 
 
 # Message:
 zenity --info --text="All Done!"
