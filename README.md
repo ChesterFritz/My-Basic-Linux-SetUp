@@ -6,7 +6,6 @@ To Start it you have to paste this command in terminal:
 Locate the file
 ```
 cd ~/Downloads
-
 ```
 And make it Executable
 
