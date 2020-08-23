@@ -1,7 +1,7 @@
 # My Basic Linux SetUp
 This is My Basic Linux Startup Scrip and whenever I install a new Linux (Gnome) base System this is the first thing I install. 
 
-Note: This works only for debian based System.
+* Note: This works only for debian based System.
 
 # Run the Bash File
 
