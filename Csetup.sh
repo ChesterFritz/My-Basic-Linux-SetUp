@@ -1,7 +1,5 @@
 #!/bin/dash
 
-# Ubuntu and PopOs My (GNOME) setup script.
-
 dpkg -l | grep -qw gdebi || sudo apt-get install -yyq gdebi
 
 # Check for Update
