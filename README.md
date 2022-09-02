@@ -16,7 +16,7 @@ And make it Executable
 ```
 chmod u+x Csetup.sh
 ```
-
+And for Arch 
 ```
 chmod u+x Arch.sh
 ```
