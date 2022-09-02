@@ -16,8 +16,18 @@ And make it Executable
 ```
 chmod u+x Csetup.sh
 ```
+
+```
+chmod u+x Arch.sh
+```
+
 Then Run this Command!
 
 ```
 ./Csetup.sh
+```
+or This for arch based linux
+
+```
+./Arch.sh
 ```
