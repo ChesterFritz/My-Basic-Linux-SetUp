@@ -1,64 +1,95 @@
-#!/bin/dash
+#!/bin/bash
+#
+# Debian/Ubuntu post-install setup script.
+# Every package manager call is non-interactive (-y / --yes / --noconfirm),
+# so nothing stops to ask you to confirm.
 
-dpkg -l | grep -qw gdebi || sudo apt-get install -yyq gdebi
+set -u
 
-# Check for Update
+# Keep apt quiet and non-interactive for the whole run.
+export DEBIAN_FRONTEND=noninteractive
 
-sudo apt update
+log() { printf '\n==> %s\n' "$1"; }
 
-# Purge Firefox (if you wan), install Brave:
+# ---------------------------------------------------------------- essentials
 
-#sudo apt purge firefox -yy
-#sudo apt purge firefox-locale-en -yy
-#if [ -d "/home/$USER/.mozilla" ]; then
-#    rm -rf /home/$USER/.mozilla
-#fi
-#if [ -d "/home/$USER/.cache/mozilla" ]; then
-#    rm -rf /home/$USER/.cache/mozilla
-#fi
+log "Installing base tools"
+sudo apt-get update -y
+sudo apt-get install -y apt-transport-https curl gdebi zenity libnotify-bin
 
-sudo apt install apt-transport-https curl
+# ---------------------------------------------------------------------- Brave
 
-curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
+log "Adding the Brave repository"
+# The old 'apt-key' command is removed in Debian 12+ and deprecated in
+# Ubuntu 22.04+. Keys now belong in /etc/apt/keyrings, referenced per repo.
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg \
+  | sudo tee /etc/apt/keyrings/brave-browser-archive-keyring.gpg > /dev/null
 
-echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+ARCH="$(dpkg --print-architecture)"
+echo "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" \
+  | sudo tee /etc/apt/sources.list.d/brave-browser-release.list > /dev/null
 
-sudo apt update
+sudo apt-get update -y
+sudo apt-get install -y brave-browser
 
-sudo apt install brave-browser
+# ------------------------------------------------------- remove preinstalled
 
-## Remove junk
-sudo apt-get remove ubuntu-web-launchers thunderbird rhythmbox -y
+log "Removing packages most people don't need"
+sudo apt-get remove -y ubuntu-web-launchers thunderbird rhythmbox
 
-## Multimedia
+# ----------------------------------------------------------------- multimedia
+
+log "Installing multimedia apps"
 sudo apt-get install -y gimp scribus
 
-## Games
+# --------------------------------------------------------------------- gaming
+
+log "Installing Steam"
 sudo apt-get install -y steam-installer
-sudo apt install steam-installer
 
-sudo add-apt-repository ppa:lutris-team/lutris
-sudo apt-get update
-sudo apt-get install lutris
+# Lutris lives in a PPA, which Ubuntu has but plain Debian does not.
+log "Installing Lutris"
+if sudo apt-get install -y software-properties-common \
+   && sudo add-apt-repository -y ppa:lutris-team/lutris \
+   && sudo apt-get update -y \
+   && sudo apt-get install -y lutris; then
+  echo "Lutris installed."
+else
+  echo "Skipped Lutris - the PPA is Ubuntu-only. Install it manually on Debian."
+fi
 
-## Disable Apport
-sudo sed -i 's/enabled=1/enabled=0/g' /etc/default/apport
+# -------------------------------------------------------------------- apport
 
-# Update it ALL:
-sudo apt update && sudo apt upgrade -y
+log "Disabling Apport crash reporting"
+if [ -f /etc/default/apport ]; then
+  sudo sed -i 's/^enabled=1/enabled=0/' /etc/default/apport
+  sudo systemctl stop apport.service || true
+  sudo systemctl disable apport.service || true
+fi
 
-# Install Git on Linux:
-sudo apt-get update
-sudo apt-get install git
-git --version
+# ---------------------------------------------------------------- dev tools
 
-# Install Java 
-sudo apt install default-jre
-sudo apt install default-jdk
-javac -version
-java -version
-echo Java is Installed 
+log "Installing Git and Java"
+sudo apt-get install -y git default-jre default-jdk
 
-# Message:
-zenity --info --text="All Done!"
-notify-send 'All Done!' 'remember to configure your Git'
+echo "git:    $(git --version)"
+echo "javac:  $(javac -version 2>&1)"
+echo "java:   $(java -version 2>&1 | head -n1)"
+
+# ------------------------------------------------------------------- upgrade
+
+log "Finishing with a full upgrade"
+sudo apt-get update -y
+sudo apt-get upgrade -y
+
+# ------------------------------------------------------------------- message
+
+if command -v zenity >/dev/null 2>&1; then
+  zenity --info --text="All Done!" 2>/dev/null || true
+fi
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send 'All Done!' 'Remember to configure your Git identity.' 2>/dev/null || true
+fi
+
+echo "All done - remember to configure your Git identity."
